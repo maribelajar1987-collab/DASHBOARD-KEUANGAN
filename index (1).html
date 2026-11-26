@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102a43">
+  <title>DompetKu — Manajemen Keuangan Pribadi</title>
+  <style>
+    :root {
+      --navy:#102a43; --navy2:#183b56; --teal:#13b8a6; --bg:#f3f6fa;
+      --text:#172b4d; --muted:#718096; --line:#e5ebf2; --white:#fff;
+      --green:#0f9d75; --red:#e45b65; --shadow:0 12px 35px rgba(16,42,67,.07);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+    button,input,select,textarea{font:inherit}
+    .app{max-width:1200px;margin:auto;padding:28px 22px 50px}
+    header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:28px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--teal),#0b8e9b);display:grid;place-items:center;color:white;font-size:23px;font-weight:800}
+    h1{font-size:21px;margin:0;color:var(--navy);letter-spacing:-.5px}
+    .sub{color:var(--muted);font-size:13px;margin-top:3px}
+    .month-wrap{display:flex;align-items:center;gap:9px;background:white;border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+    .month-wrap label{font-size:12px;color:var(--muted)}
+    .month-wrap input{border:0;color:var(--navy);font-weight:650;outline:0;background:transparent}
+    .welcome{background:linear-gradient(115deg,#102a43,#1b5364);color:white;border-radius:22px;padding:26px 28px;margin-bottom:22px;display:flex;justify-content:space-between;align-items:center;gap:20px;box-shadow:var(--shadow)}
+    .welcome p{margin:0 0 7px;color:#b9d7dc;font-size:13px}
+    .welcome h2{margin:0;font-size:25px;letter-spacing:-.6px}
+    .welcome .date{color:#c8dce5;font-size:13px;text-align:right}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:22px}
+    .stat{background:white;border:1px solid var(--line);border-radius:17px;padding:19px 20px;box-shadow:var(--shadow)}
+    .stat-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px}
+    .stat-icon{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;font-size:17px;background:#eafaf5;color:var(--green)}
+    .stat:nth-child(2) .stat-icon{background:#fff0f1;color:var(--red)}
+    .stat:nth-child(3) .stat-icon{background:#edf4ff;color:#3478c8}
+    .amount{font-size:24px;font-weight:750;margin-top:13px;letter-spacing:-.6px;overflow-wrap:anywhere}
+    .stat small{display:block;color:var(--muted);font-size:11px;margin-top:5px}
+    .main-grid{display:grid;grid-template-columns: minmax(300px, .85fr) minmax(0,1.55fr);gap:18px;align-items:start}
+    .panel{background:white;border:1px solid var(--line);border-radius:18px;padding:21px;box-shadow:var(--shadow)}
+    .panel h3{margin:0 0 5px;font-size:16px;color:var(--navy)}
+    .panel-desc{margin:0 0 18px;color:var(--muted);font-size:12px}
+    .type-switch{display:grid;grid-template-columns:1fr 1fr;background:#f0f4f8;padding:4px;border-radius:11px;margin-bottom:17px}
+    .type-switch button{border:0;background:transparent;padding:10px;border-radius:8px;color:var(--muted);font-weight:650;cursor:pointer}
+    .type-switch button.active{background:white;color:var(--navy);box-shadow:0 2px 8px #102a4312}
+    .field{margin-bottom:13px}
+    .field label{display:block;font-size:12px;font-weight:650;color:#526579;margin-bottom:6px}
+    .field input,.field select,.field textarea{width:100%;border:1px solid #dce4ed;border-radius:10px;padding:10px 11px;color:var(--text);outline:none;background:white}
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px #13b8a61a}
+    .field textarea{min-height:76px;resize:vertical}
+    .field input[type=file]{padding:8px;font-size:12px}
+    .hint{font-size:11px;color:var(--muted);margin-top:5px}
+    .primary{width:100%;border:0;border-radius:11px;background:var(--teal);color:#062e35;font-weight:750;padding:12px;cursor:pointer;margin-top:4px;transition:.2s}
+    .primary:hover{filter:brightness(.96);transform:translateY(-1px)}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:2px 0 16px}
+    .toolbar h3{margin:0}
+    .toolbar-actions{display:flex;gap:8px;align-items:center}
+    .secondary{border:1px solid var(--line);background:white;border-radius:9px;padding:8px 10px;color:var(--navy);font-size:12px;font-weight:650;cursor:pointer}
+    .table-wrap{overflow-x:auto}
+    table{border-collapse:collapse;width:100%;min-width:570px}
+    th{text-align:left;color:#8794a5;font-size:11px;font-weight:650;padding:10px 9px;border-bottom:1px solid var(--line)}
+    td{padding:13px 9px;border-bottom:1px solid #edf1f5;font-size:12px;vertical-align:middle}
+    tr:last-child td{border-bottom:0}
+    .desc-main{font-weight:700;color:var(--navy);font-size:12px}
+    .desc-sub{font-size:11px;color:var(--muted);margin-top:4px}
+    .tag{display:inline-block;background:#f0f4f8;border-radius:20px;padding:5px 8px;color:#53677b;font-size:10px}
+    .income{color:var(--green);font-weight:750;white-space:nowrap}
+    .expense{color:var(--red);font-weight:750;white-space:nowrap}
+    .row-actions{display:flex;gap:6px}
+    .icon-btn{border:1px solid var(--line);background:white;border-radius:7px;padding:5px 7px;cursor:pointer;color:#66788a}
+    .photo-link{color:#168b9a;text-decoration:none;font-weight:650}
+    .empty{text-align:center;padding:38px 12px;color:var(--muted);font-size:13px}
+    .empty .emoji{font-size:30px;margin-bottom:8px}
+    .footer{text-align:center;color:#98a5b4;font-size:11px;margin-top:24px;line-height:1.6}
+    .notice{background:#fff8e8;border:1px solid #f3e4b9;border-radius:12px;padding:12px 14px;color:#80652b;font-size:11px;line-height:1.5;margin-top:15px}
+    @media(max-width:850px){.main-grid{grid-template-columns:1fr}.cards{gap:10px}.stat{padding:15px}.amount{font-size:20px}}
+    @media(max-width:600px){.app{padding:18px 13px 35px}header{align-items:flex-start;flex-direction:column}.month-wrap{width:100%;justify-content:space-between}.welcome{padding:21px;border-radius:17px}.welcome h2{font-size:21px}.welcome .date{font-size:11px}.cards{grid-template-columns:1fr;gap:9px}.stat{display:flex;justify-content:space-between;align-items:center}.stat-top{gap:9px}.amount{margin:0;font-size:18px}.stat small{display:none}.panel{padding:16px}.toolbar{align-items:flex-start;flex-direction:column}.toolbar-actions{width:100%}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="logo">D</div>
+        <div><h1>DompetKu</h1><div class="sub">Catat, pantau, dan kendalikan keuangan pribadi</div></div>
+      </div>
+      <div class="month-wrap"><label for="monthFilter">Periode laporan</label><input type="month" id="monthFilter"></div>
+    </header>
+
+    <section class="welcome">
+      <div><p>RINGKASAN KEUANGAN BULANAN</p><h2>Keuangan lebih teratur,<br>hidup lebih tenang.</h2></div>
+      <div class="date" id="todayText"></div>
+    </section>
+
+    <section class="cards">
+      <div class="stat"><div><div class="stat-top"><span>Total Pemasukan</span><span class="stat-icon">↗</span></div><div class="amount" id="totalIncome">Rp0</div><small>Akumulasi pemasukan bulan ini</small></div></div>
+      <div class="stat"><div><div class="stat-top"><span>Total Pengeluaran</span><span class="stat-icon">↘</span></div><div class="amount" id="totalExpense">Rp0</div><small>Akumulasi pengeluaran bulan ini</small></div></div>
+      <div class="stat"><div><div class="stat-top"><span>Sisa Saldo</span><span class="stat-icon">◈</span></div><div class="amount" id="balance">Rp0</div><small>Pemasukan dikurangi pengeluaran</small></div></div>
+    </section>
+
+    <section class="main-grid">
+      <div class="panel">
+        <h3>Tambah Transaksi</h3>
+        <p class="panel-desc">Masukkan pemasukan atau pengeluaran Anda.</p>
+        <div class="type-switch">
+          <button type="button" id="incomeTab" class="active">＋ Pemasukan</button>
+          <button type="button" id="expenseTab">－ Pengeluaran</button>
+        </div>
+        <form id="transactionForm">
+          <div class="field"><label for="amountInput">Jumlah (Rupiah) *</label><input id="amountInput" type="number" min="1" step="1" placeholder="Contoh: 250000" required></div>
+          <div class="field"><label for="dateInput">Tanggal transaksi *</label><input id="dateInput" type="date" required></div>
+          <div class="field"><label for="categoryInput">Kategori *</label>
+            <select id="categoryInput" required></select>
+          </div>
+          <div class="field"><label for="descriptionInput">Keterangan *</label><textarea id="descriptionInput" placeholder="Contoh: Belanja kebutuhan dapur, gaji bulanan..." required></textarea></div>
+          <div class="field"><label for="photoInput">Foto bukti (opsional)</label><input id="photoInput" type="file" accept="image/*"><div class="hint">Pilih foto struk atau bukti transaksi. Ukuran foto akan diperkecil otomatis.</div></div>
+          <button class="primary" type="submit">Simpan Transaksi</button>
+        </form>
+        <div class="notice"><strong>Catatan penyimpanan:</strong> Data disimpan di browser/perangkat yang sedang digunakan. Data tidak otomatis tersinkron ke perangkat lain. Jangan hapus data browser sebelum mengekspor cadangan.</div>
+      </div>
+
+      <div class="panel">
+        <div class="toolbar">
+          <div><h3>Riwayat Transaksi</h3><p class="panel-desc" style="margin:4px 0 0">Daftar transaksi pada periode terpilih.</p></div>
+          <div class="toolbar-actions"><button class="secondary" id="exportBtn" type="button">↓ Ekspor CSV</button></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>TANGGAL</th><th>TRANSAKSI</th><th>KATEGORI</th><th>JUMLAH</th><th>AKSI</th></tr></thead>
+            <tbody id="transactionList"></tbody>
+          </table>
+          <div class="empty" id="emptyState"><div class="emoji">🧾</div>Belum ada transaksi pada bulan ini.<br>Mulai catat transaksi pertama Anda.</div>
+        </div>
+      </div>
+    </section>
+    <div class="footer">DompetKu • Aplikasi keuangan pribadi sederhana<br>Data tersimpan secara lokal di browser Anda.</div>
+  </div>
+
+<script>
+  // DOMPETKU: data transaksi disimpan pada localStorage browser.
+  const STORAGE_KEY = "dompetku_transactions_v1";
+  let currentType = "income";
+  let transactions = loadTransactions();
+
+  const $ = (id) => document.getElementById(id);
+  const rupiah = (value) => new Intl.NumberFormat("id-ID", {
+    style: "currency", currency: "IDR", maximumFractionDigits: 0
+  }).format(value);
+
+  function loadTransactions() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch (error) { return []; }
+  }
+  function saveTransactions() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+      return true;
+    } catch (error) {
+      alert("Penyimpanan browser penuh. Coba gunakan foto yang lebih kecil atau hapus beberapa transaksi lama.");
+      return false;
+    }
+  }
+  function localDateString(date = new Date()) {
+    const offset = date.getTimezoneOffset();
+    return new Date(date.getTime() - offset * 60000).toISOString().slice(0, 10);
+  }
+  function setCategories() {
+    const income = ["Gaji","Usaha","Bonus","Investasi","Hadiah","Lainnya"];
+    const expense = ["Makanan & Minuman","Transportasi","Belanja","Tagihan & Utilitas","Rumah Tangga","Pendidikan","Kesehatan","Hiburan","Sosial & Donasi","Cicilan","Lainnya"];
+    $("categoryInput").innerHTML = (currentType === "income" ? income : expense)
+      .map(item => `<option value="${item}">${item}</option>`).join("");
+    $("incomeTab").classList.toggle("active", currentType === "income");
+    $("expenseTab").classList.toggle("active", currentType === "expense");
+  }
+  function setType(type) {
+    currentType = type;
+    setCategories();
+  }
+  $("incomeTab").addEventListener("click", () => setType("income"));
+  $("expenseTab").addEventListener("click", () => setType("expense"));
+
+  function selectedMonth() { return $("monthFilter").value; }
+  function render() {
+    const month = selectedMonth();
+    const filtered = transactions.filter(item => item.date.slice(0, 7) === month)
+      .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+    const income = filtered.filter(x => x.type === "income").reduce((sum, x) => sum + x.amount, 0);
+    const expense = filtered.filter(x => x.type === "expense").reduce((sum, x) => sum + x.amount, 0);
+    $("totalIncome").textContent = rupiah(income);
+    $("totalExpense").textContent = rupiah(expense);
+    $("balance").textContent = rupiah(income - expense);
+    $("balance").style.color = income - expense < 0 ? "var(--red)" : "var(--navy)";
+    $("transactionList").innerHTML = "";
+    $("emptyState").style.display = filtered.length ? "none" : "block";
+
+    filtered.forEach(item => {
+      const tr = document.createElement("tr");
+      const date = new Date(item.date + "T00:00:00").toLocaleDateString("id-ID", {day:"2-digit",month:"short",year:"numeric"});
+      const detail = document.createElement("div");
+      detail.innerHTML = `<div class="desc-main"></div><div class="desc-sub"></div>`;
+      detail.querySelector(".desc-main").textContent = item.description;
+      detail.querySelector(".desc-sub").textContent = item.type === "income" ? "Pemasukan" : "Pengeluaran";
+      const dateTd = document.createElement("td"); dateTd.textContent = date;
+      const detailTd = document.createElement("td"); detailTd.appendChild(detail);
+      const categoryTd = document.createElement("td");
+      const tag = document.createElement("span"); tag.className = "tag"; tag.textContent = item.category; categoryTd.appendChild(tag);
+      const amountTd = document.createElement("td"); amountTd.className = item.type === "income" ? "income" : "expense";
+      amountTd.textContent = (item.type === "income" ? "+" : "−") + rupiah(item.amount);
+      const actionTd = document.createElement("td");
+      const actions = document.createElement("div"); actions.className = "row-actions";
+      if (item.photo) {
+        const photo = document.createElement("button"); photo.className = "icon-btn"; photo.type = "button"; photo.textContent = "Foto"; photo.title = "Lihat foto bukti";
+        photo.addEventListener("click", () => {
+          const win = window.open(); if (win) { const img = win.document.createElement("img"); img.src = item.photo; img.style.maxWidth = "100%"; win.document.body.appendChild(img); }
+          else alert("Izinkan pop-up browser untuk melihat foto.");
+        });
+        actions.appendChild(photo);
+      }
+      const del = document.createElement("button"); del.className = "icon-btn"; del.type = "button"; del.textContent = "Hapus"; del.title = "Hapus transaksi";
+      del.addEventListener("click", () => {
+        if (confirm("Hapus transaksi ini?")) {
+          transactions = transactions.filter(x => x.id !== item.id);
+          if (saveTransactions()) render();
+        }
+      });
+      actions.appendChild(del); actionTd.appendChild(actions);
+      [dateTd, detailTd, categoryTd, amountTd, actionTd].forEach(td => tr.appendChild(td));
+      $("transactionList").appendChild(tr);
+    });
+  }
+
+  async function compressImage(file) {
+    if (!file) return "";
+    if (!file.type.startsWith("image/")) throw new Error("File harus berupa gambar.");
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error("Foto tidak dapat dibaca."));
+      reader.readAsDataURL(file);
+    });
+    const img = await new Promise((resolve, reject) => {
+      const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = dataUrl;
+    });
+    const maxSide = 1000, scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(img.width * scale); canvas.height = Math.round(img.height * scale);
+    canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 0.72);
+  }
+
+  $("transactionForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const amount = Number($("amountInput").value);
+    if (!Number.isFinite(amount) || amount <= 0) { alert("Masukkan jumlah lebih dari nol."); return; }
+    const submit = event.submitter;
+    submit.disabled = true; submit.textContent = "Menyimpan...";
+    try {
+      const photo = await compressImage($("photoInput").files[0]);
+      const transaction = {
+        id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random()),
+        type: currentType, amount, date: $("dateInput").value,
+        category: $("categoryInput").value,
+        description: $("descriptionInput").value.trim(),
+        photo, createdAt: Date.now()
+      };
+      transactions.push(transaction);
+      if (saveTransactions()) {
+        $("transactionForm").reset();
+        $("dateInput").value = localDateString();
+        setCategories(); render();
+      } else {
+        transactions = transactions.filter(x => x.id !== transaction.id);
+      }
+    } catch (error) {
+      alert(error.message || "Terjadi kesalahan saat menyimpan foto.");
+    } finally {
+      submit.disabled = false; submit.textContent = "Simpan Transaksi";
+    }
+  });
+
+  $("monthFilter").addEventListener("change", render);
+  $("exportBtn").addEventListener("click", () => {
+    const month = selectedMonth();
+    const rows = [["Tanggal","Jenis","Kategori","Keterangan","Jumlah (Rupiah)"]];
+    transactions.filter(x => x.date.slice(0,7) === month).forEach(x =>
+      rows.push([x.date, x.type === "income" ? "Pemasukan" : "Pengeluaran", x.category, x.description, x.amount])
+    );
+    if (rows.length === 1) { alert("Belum ada transaksi untuk diekspor pada bulan ini."); return; }
+    const csv = "\uFEFF" + rows.map(row => row.map(value => `"${String(value).replace(/"/g,'""')}"`).join(",")).join("\r\n");
+    const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a"); link.href = url; link.download = `dompetku-${month}.csv`; link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  $("monthFilter").value = localDateString().slice(0,7);
+  $("dateInput").value = localDateString();
+  $("todayText").textContent = new Date().toLocaleDateString("id-ID", {weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  setCategories(); render();
+</script>
+</body>
+</html>
